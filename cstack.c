@@ -29,16 +29,15 @@ struct node //структура, описывающая конкретный у
 hstack_t stack_new(void)  //создание нового стека
 {
     ++i;
-    stack_entry* p = (stack_entry*)malloc(sizeof(stack_entry)); // указатель на конкретный стек
+    stack_entry* p = (stack_entry*)realloc(g_table[i - 1].entries, sizeof(stack_entry)); // указатель на конкретный стек
     p->reserved = 0; //стек активен
+    //p->stack = (node*)malloc(sizeof(node*));
     p->stack = NULL;
     g_table[i - 1].size = i;
     g_table[i - 1].entries = p;
     return(i);
 }
 //стек создавался на удаленном месте??????????????
-//data[0]
-// malloc and realloc
 
 int stack_valid_handler(const hstack_t stack)
 {
@@ -87,20 +86,20 @@ void stack_push(const hstack_t stack, const void* data, const unsigned int size)
     {
         exit;
     }
-    stack_entry* p = g_table[stack - 1].entries;//указатель на данный стек, в который мы пушаем элемент
-    node* lst = (struct node*)malloc(sizeof(node) + size); // выделение памяти под узел
-    const char* data_char = (const char*)malloc(sizeof(data)); // приведение входных данных типа const void* к типу const char*
-    memcpy((void*)lst->data[0], data, size);
-    if (stack_size(stack) == 0)
-    {
-        lst->prev = NULL;
-    }
-    else
-    {
-        lst->prev = p->stack;
-    } //переставляем указатель на предыдущий элемент
-    p->stack = lst;//переставляем указатель на вершину стека
-    --(p->reserved);
+
+    node* lst = (struct node*)malloc(sizeof(node) + size + sizeof(lst->prev)); // выделение памяти под узел
+    lst->prev = (node*)malloc(sizeof(node*)); // выделяем память под указатель на предыдущий элемент
+
+    stack_entry* p = (stack_entry*)realloc(g_table[stack - 1].entries, sizeof(lst) + sizeof(stack_entry));
+    p = g_table[stack - 1].entries;
+
+    lst->prev = p->stack; //переставляем указатель на предыдущий элемент
+    p->stack = lst; //переставляем указатель на вершину стека
+    ++(p->reserved);
+
+    std::cout << g_table[stack - 1].entries << "\n";
+
+    lst->data[0] = (char*)data;
 }
 
 unsigned int stack_pop(const hstack_t stack, void* data_out, const unsigned int size)
@@ -116,8 +115,13 @@ unsigned int stack_pop(const hstack_t stack, void* data_out, const unsigned int 
     data_out = (void*)lst->data[razmer - 1];
     node* free(lst);
     return(razmer);
+    --(p->reserved);
 }
 int main()
 {
-
+    stack_new();
+    stack_new();
+    int data = 1;
+    stack_push(1, (const void*)data, sizeof(data));
+    std::cout << g_table[0].entries->reserved;
 }
