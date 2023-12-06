@@ -23,7 +23,7 @@ struct node //структура, описывающая конкретный у
 {
     struct node* prev; // указатель на предыдущий элемент
     unsigned int size; //размер данных
-    const char* data[0]; // поле данных
+    char* data[0]; // поле данных
 };
 
 hstack_t stack_new(void)  //создание нового стека
@@ -34,7 +34,7 @@ hstack_t stack_new(void)  //создание нового стека
     p->stack = NULL;
     g_table[i - 1].size = i;
     g_table[i - 1].entries = p;
-    return(i - 1);
+    return(i);
 }
 //стек создавался на удаленном месте??????????????
 //data[0]
@@ -42,11 +42,11 @@ hstack_t stack_new(void)  //создание нового стека
 
 int stack_valid_handler(const hstack_t stack)
 {
-    if (stack >= i)
+    if (stack - 1 >= i)
     {
         return 1;
     }
-    if (g_table[stack].entries->reserved == -1)
+    if (g_table[stack - 1].entries->reserved == -1)
     {
         return 1;
     }
@@ -59,7 +59,7 @@ void stack_free(const hstack_t stack) //удаление стека
     {
         exit;
     }
-    stack_entry* p = g_table[stack].entries; // указатель на конкретный стек
+    stack_entry* p = g_table[stack - 1].entries; // указатель на конкретный стек
     p->reserved = -1; //стек неактивен
 }
 
@@ -69,7 +69,7 @@ unsigned int stack_size(const hstack_t stack)
     {
         exit;
     }
-    stack_entry* p = g_table[stack].entries;
+    stack_entry* p = g_table[stack - 1].entries;
     return(p->reserved);
 }
 
@@ -87,11 +87,18 @@ void stack_push(const hstack_t stack, const void* data, const unsigned int size)
     {
         exit;
     }
-    stack_entry* p = g_table[stack].entries;//указатель на данный стек, в который мы пушаем элемент
+    stack_entry* p = g_table[stack - 1].entries;//указатель на данный стек, в который мы пушаем элемент
     node* lst = (struct node*)malloc(sizeof(node) + size); // выделение памяти под узел
     const char* data_char = (const char*)malloc(sizeof(data)); // приведение входных данных типа const void* к типу const char*
-    lst->data[size - 1] = data_char; //запись данных
-    lst->prev = p->stack; //переставляем указатель на предыдущий элемент
+    memcpy((void*)lst->data[0], data, size);
+    if (stack_size(stack) == 0)
+    {
+        lst->prev = NULL;
+    }
+    else
+    {
+        lst->prev = p->stack;
+    } //переставляем указатель на предыдущий элемент
     p->stack = lst;//переставляем указатель на вершину стека
     --(p->reserved);
 }
@@ -102,9 +109,9 @@ unsigned int stack_pop(const hstack_t stack, void* data_out, const unsigned int 
     {
         exit;
     }
-    node* lst = g_table[stack].entries->stack;
+    node* lst = g_table[stack - 1].entries->stack;
     unsigned int razmer = lst->size;
-    stack_entry* p = g_table[stack].entries;
+    stack_entry* p = g_table[stack - 1].entries;
     p->stack = lst->prev; //переставляем указатель на вершину стека
     data_out = (void*)lst->data[razmer - 1];
     node* free(lst);
@@ -112,5 +119,5 @@ unsigned int stack_pop(const hstack_t stack, void* data_out, const unsigned int 
 }
 int main()
 {
-    stack_new();
+
 }
