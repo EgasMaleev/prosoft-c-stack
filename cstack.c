@@ -23,7 +23,8 @@ struct node //структура, описывающая конкретный у
 {
     struct node* prev; // указатель на предыдущий элемент
     unsigned int size; //размер данных
-    char* data[0]; // поле данных
+    //char* data[0]; // поле данных
+    void* data_void;
 };
 
 hstack_t stack_new(void)  //создание нового стека
@@ -88,18 +89,19 @@ void stack_push(const hstack_t stack, const void* data, const unsigned int size)
     }
 
     node* lst = (struct node*)malloc(sizeof(node) + size + sizeof(lst->prev)); // выделение памяти под узел
-    lst->prev = (node*)malloc(sizeof(node*)); // выделяем память под указатель на предыдущий элемент
+    //lst->prev = (node*)malloc(sizeof(node*)); // выделяем память под указатель на предыдущий элемент
 
-    stack_entry* p = (stack_entry*)realloc(g_table[stack - 1].entries, sizeof(lst) + sizeof(stack_entry));
-    p = g_table[stack - 1].entries;
+    //stack_entry* p = (stack_entry*)realloc(g_table[stack - 1].entries, sizeof(lst) + sizeof(stack_entry));
+    stack_entry* p = g_table[stack - 1].entries;
 
     lst->prev = p->stack; //переставляем указатель на предыдущий элемент
     p->stack = lst; //переставляем указатель на вершину стека
     ++(p->reserved);
 
-    std::cout << g_table[stack - 1].entries << "\n";
+    //std::cout << g_table[stack - 1].entries << "\n";
 
-    lst->data[0] = (char*)data;
+    //lst->data[0] = (char*)data;
+    memcpy(lst->data_void, data, size);
 }
 
 unsigned int stack_pop(const hstack_t stack, void* data_out, const unsigned int size)
@@ -112,16 +114,12 @@ unsigned int stack_pop(const hstack_t stack, void* data_out, const unsigned int 
     unsigned int razmer = lst->size;
     stack_entry* p = g_table[stack - 1].entries;
     p->stack = lst->prev; //переставляем указатель на вершину стека
-    data_out = (void*)lst->data[razmer - 1];
+    //data_out = (void*)lst->data[razmer - 1];
+    data_out = lst->data_void;
     node* free(lst);
     return(razmer);
     --(p->reserved);
 }
 int main()
 {
-    stack_new();
-    stack_new();
-    int data = 1;
-    stack_push(1, (const void*)data, sizeof(data));
-    std::cout << g_table[0].entries->reserved;
 }
