@@ -114,12 +114,12 @@ unsigned int stack_pop(const hstack_t stack, void* data_out, const unsigned int 
     node* lst = g_table[stack - 1].entries->stack;
     unsigned int razmer = lst->size;
     stack_entry* p = g_table[stack - 1].entries;
+    --(p->reserved);
     p->stack = lst->prev; //переставляем указатель на вершину стека
-    //data_out = (void*)lst->data[razmer - 1];
+    data_out = malloc(size);
     data_out = lst->data_void;
     node* free(lst);
     return(razmer);
-    --(p->reserved);
 }
 int main()
 {
