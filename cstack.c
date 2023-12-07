@@ -101,6 +101,7 @@ void stack_push(const hstack_t stack, const void* data, const unsigned int size)
     //std::cout << g_table[stack - 1].entries << "\n";
 
     //lst->data[0] = (char*)data;
+    lst->data_void = malloc(size);
     memcpy(lst->data_void, data, size);
 }
 
